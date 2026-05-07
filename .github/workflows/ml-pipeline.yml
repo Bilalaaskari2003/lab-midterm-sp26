@@ -1,0 +1,31 @@
+name: ML Pipeline
+
+on:
+  push:
+    paths:
+      - 'dataset/train.csv'
+
+jobs:
+  train-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train Model
+        run: python train.py
+
+      - name: Build Docker Image
+        run: docker build -t ml-api .
+
+      - name: Run Docker Container
+        run: docker run -d -p 8000:8000 ml-api
